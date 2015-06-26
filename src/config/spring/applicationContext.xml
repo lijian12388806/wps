@@ -1,0 +1,218 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+	http://www.springframework.org/schema/tx
+	http://www.springframework.org/schema/tx/spring-tx-2.0.xsd
+	http://www.springframework.org/schema/aop
+	http://www.springframework.org/schema/aop/spring-aop-2.0.xsd">
+
+
+	<bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource">
+		<property name="driverClass" value="com.mysql.jdbc.Driver" />
+		<property name="jdbcUrl"
+			value="jdbc:mysql:///db_crm?useUnicode=true&amp;characterEncoding=UTF-8" />
+		<property name="user" value="root" /> 
+			<property name="password" value="123" />
+<!--		<property name="alias" value="implat" />-->
+		<property name="maxPoolSize" value="20" />
+		<property name="minPoolSize" value="5" />
+<!--		<property name="maximumActiveTime" value="300000" />-->
+		<property name="initialPoolSize" value="5" />
+<!--		<property name="simultaneousBuildThrottle" value="50" />-->
+		
+	</bean>
+
+	<bean id="sessionFactory"
+		class="org.springframework.orm.hibernate3.LocalSessionFactoryBean">
+		<property name="dataSource">
+			<ref bean="dataSource" />
+		</property>
+		<property name="hibernateProperties">
+			<props>
+				<prop key="hibernate.dialect">
+					org.hibernate.dialect.SQLServerDialect
+				</prop>
+				<prop key="hibernate.show_sql">false</prop>
+				<prop key="hibernate.format_sql">false</prop>
+				<prop key="hibernate.cache.use_query_cache">true</prop>
+				<prop key="hibernate.jdbc.fetch_size">50</prop>
+				<prop key="hibernate.jdbc.batch_size">10</prop>
+				<prop key="use_streams_for_binary">true</prop>
+				<prop key="hibernate.cache.provider_class">
+					org.hibernate.cache.EhCacheProvider
+				</prop>
+<!--				<prop key="hibernate.hbm2ddl.auto">create</prop>-->
+				<prop key="hibernate.generate_statistics">true</prop>
+				<prop key="hibernate.connection.release_mode">
+					auto
+				</prop>
+			</props>
+		</property>
+		<property name="mappingDirectoryLocations">
+			<list>
+				<value>classpath*:/com/liveneo/plat/hibernate/hbm</value>
+			</list>
+		</property>
+	</bean>
+	<!-- Hibernate  transactionManager-->
+	<bean id="transactionManager"
+		class="org.springframework.orm.hibernate3.HibernateTransactionManager">
+		<property name="sessionFactory">
+			<ref local="sessionFactory" />
+		</property>
+	</bean>
+	<!-- Hibernate  baseTransaction-->
+	<bean id="baseTransactionProxy"
+		class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean"
+		abstract="true" lazy-init="true">
+		<property name="transactionManager" ref="transactionManager" />
+		<property name="proxyTargetClass" value="true" />
+		<property name="transactionAttributes">
+			<props>
+				<prop key="get*">PROPAGATION_REQUIRED,readOnly</prop>
+				<prop key="set*">PROPAGATION_REQUIRED</prop>
+				<prop key="update*">PROPAGATION_REQUIRED</prop>
+				<prop key="add*">PROPAGATION_REQUIRED</prop>
+				<prop key="save*">PROPAGATION_REQUIRED</prop>
+				<prop key="del*">PROPAGATION_REQUIRED</prop>
+				<prop key="submit*">PROPAGATION_REQUIRED</prop>
+				<prop key="excute*">PROPAGATION_REQUIRED</prop>
+				<prop key="addLog">PROPAGATION_REQUIRES_NEW</prop>
+				<prop key="*">PROPAGATION_REQUIRED,readOnly</prop>
+			</props>
+		</property>
+	</bean>
+<!--支持事物注解-->
+	<tx:annotation-driven transaction-manager="transactionManager"/>
+	<bean name="bdDictDAO" class="com.liveneo.plat.hibernate.dao.dao.BdDictDAO">
+		<property name="sessionFactory">
+			<ref bean="sessionFactory" />
+		</property>
+	</bean>
+	<bean name="bdDictdetailDAO" class="com.liveneo.plat.hibernate.dao.dao.BdDictdetailDAO">
+		<property name="sessionFactory">
+			<ref bean="sessionFactory" />
+		</property>
+	</bean>
+	<bean name="userinfoDAO" class="com.liveneo.plat.hibernate.dao.dao.UserinfoDAO">
+		<property name="sessionFactory">
+			<ref bean="sessionFactory" />
+		</property>
+	</bean>
+	<bean name="menuinfoDAO" class="com.liveneo.plat.hibernate.dao.dao.MenuinfoDAO">
+		<property name="sessionFactory">
+			<ref bean="sessionFactory" />
+		</property>
+	</bean>
+	<bean name="uploadfileDAO" class="com.liveneo.plat.hibernate.dao.dao.UploadfileDAO">
+		<property name="sessionFactory">
+			<ref bean="sessionFactory" />
+		</property>
+	</bean>
+	<bean name="logmsgDAO" class="com.liveneo.plat.hibernate.dao.dao.LogmsgDAO">
+		<property name="sessionFactory">
+			<ref bean="sessionFactory" />
+		</property>
+	</bean>
+	<bean name="bdRoleDAO" class="com.liveneo.plat.hibernate.dao.dao.BdRoleDAO">
+		<property name="sessionFactory">
+			<ref bean="sessionFactory" />
+		</property>
+	</bean>
+	<bean name="bdRolemenuDAO" class="com.liveneo.plat.hibernate.dao.dao.BdRolemenuDAO">
+		<property name="sessionFactory">
+			<ref bean="sessionFactory" />
+		</property>
+	</bean>
+	<bean name="bdUserinforoleDAO" class="com.liveneo.plat.hibernate.dao.dao.BdUserinforoleDAO">
+		<property name="sessionFactory">
+			<ref bean="sessionFactory" />
+		</property>
+	</bean>
+	<bean name="calldetailDAO" class="com.liveneo.plat.hibernate.dao.dao.CalldetailDAO">
+		<property name="sessionFactory">
+			<ref bean="sessionFactory" />
+		</property>
+	</bean>
+	<bean name="customerinfoDAO" class="com.liveneo.plat.hibernate.dao.dao.CustomerinfoDAO">
+		<property name="sessionFactory">
+			<ref bean="sessionFactory" />
+		</property>
+	</bean>
+	<bean name="cusphonelistDAO" class="com.liveneo.plat.hibernate.dao.dao.CusphonelistDAO">
+		<property name="sessionFactory">
+			<ref bean="sessionFactory" />
+		</property>
+	</bean>
+	<bean name="departmentDAO" class="com.liveneo.plat.hibernate.dao.dao.DepartmentDAO">
+		<property name="sessionFactory">
+			<ref bean="sessionFactory" />
+		</property>
+	</bean>
+	<bean name="ivrvoiceDAO" class="com.liveneo.plat.hibernate.dao.dao.IvrvoiceDAO">
+		<property name="sessionFactory">
+			<ref bean="sessionFactory" />
+		</property>
+	</bean>
+	<bean name="satscoreDAO" class="com.liveneo.plat.hibernate.dao.dao.SatscoreDAO">
+		<property name="sessionFactory">
+			<ref bean="sessionFactory" />
+		</property>
+	</bean>
+	<bean name="workingcalendarDAO" class="com.liveneo.plat.hibernate.dao.dao.WorkingcalendarDAO">
+		<property name="sessionFactory">
+			<ref bean="sessionFactory" />
+		</property>
+	</bean>
+	<bean name="workorderDAO" class="com.liveneo.plat.hibernate.dao.dao.WorkorderDAO">
+		<property name="sessionFactory">
+			<ref bean="sessionFactory" />
+		</property>
+	</bean>
+	<bean name="workstationDAO" class="com.liveneo.plat.hibernate.dao.dao.WorkstationDAO">
+		<property name="sessionFactory">
+			<ref bean="sessionFactory" />
+		</property>
+	</bean>
+	<bean name="orderdealinfoDAO" class="com.liveneo.plat.hibernate.dao.dao.OrderdealinfoDAO">
+		<property name="sessionFactory">
+			<ref bean="sessionFactory" />
+		</property>
+	</bean>
+	<bean name="bdJobmsgDAO"
+		class="com.liveneo.plat.hibernate.dao.dao.BdJobmsgDAO">
+		<property name="sessionFactory">
+			<ref bean="sessionFactory" />
+		</property>
+	</bean>
+	<bean name="recordfileDAO"
+		class="com.liveneo.plat.hibernate.dao.dao.RecordfileDAO">
+		<property name="sessionFactory">
+			<ref bean="sessionFactory" />
+		</property>
+	</bean>
+    <!--权限注入-->
+    <bean id="baseDao"  abstract="true" class="com.liveneo.plat.hibernate.dao.basedao.BaseDao">
+		<property name="sessionFactory" ref="sessionFactory" />
+	</bean>
+	<bean id="authorityDao" parent="baseDao" class="com.liveneo.plat.hibernate.dao.basedao.AuthorityDao">
+	</bean>
+	<bean id="resourceDao" parent="baseDao" class="com.liveneo.plat.hibernate.dao.basedao.ResourceDao">
+	</bean>
+    
+
+	<!--************************************************************************-->
+	 <!--权限注入-->
+    <bean id="baseService"  abstract="true" class="com.liveneo.plat.service.base.BaseService">
+		<property name="baseDao" ref="authorityDao" />
+	</bean>
+	<bean id="authorityService" parent="baseService" class="com.liveneo.plat.security.service.AuthorityService">
+	</bean>
+	<bean id="resourceService" parent="baseService" class="com.liveneo.plat.security.service.ResourceService">
+	</bean>
+	
+	
+		
+</beans>
